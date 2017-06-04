@@ -11,14 +11,20 @@ psql -U ${username} -d ${db} -a -f insert_COMPANY_MEMEBERS1.sql
 psql -U ${username} -d ${db} -a -f insert_DEPARTMENT1.sql
 
 echo LOG: Preparing replication mechanism
-# pg_dump
+
+echo LOG: Dumping ${db} data and schema
+pg_dump -U ${username} --no-owner --schema-only -f dump_schema.sql
+pg_dump -U ${username} --no-owner --data-only -f dump_data.sql
 # modify dump to apply on foreign server
-# load fdw extension
+
+echo LOG: Configuring connection to MySQL
+psql -U ${username} -d ${db} -a -f configureMySQL.sql
+
 # apply it
 
 # set up triggers
 
-# maybe move rest to test script?
+# maybe move the rest to test script?
 echo LOG: Inserting new data into db: ${db}
 psql -U ${username} -d ${db} -a -f insert_COMPANY_MEMEBERS2.sql
 psql -U ${username} -d ${db} -a -f insert_DEPARTMENT2.sql
