@@ -16,14 +16,14 @@ echo LOG: Dumping ${db} data and schema
 pg_dump -U ${username} --no-owner --schema-only -f dump_schema.sql
 pg_dump -U ${username} --no-owner --data-only -f dump_data.sql
 
-# modify dump to apply on foreign server
+echo LOG: Modifing database schema to recreate it on MySQL database
 sed -i '/^--/d' dump_schema.sql
+sed -i '/^COMMENT/d' dump_schema.sql
+sed -i '/^SET/d' dump_schema.sql
+sed -i '/^GRANT/d' dump_schema.sql
+sed -i '/^CREATE EXTENSION/d' dump_schema.sql
+sed -i 's/^ALTER TABLE ONLY/ALTER TABLE/' dump_schema.sql
 sed -i '/^$/N;/^\n$/D' dump_schema.sql
-
-# modify schema for postgres foreign tables
-# modify schema for mysql
-# - remove everything except CREATE TABLE and ALTER TABLE
-# - remove ONLY after ALTER TABLE
 
 echo LOG: Configuring connection to MySQL
 psql -U ${username} -d ${db} -a -f configureMySQL.sql
@@ -31,7 +31,9 @@ psql -U ${username} -d ${db} -a -f configureMySQL.sql
 echo LOG: Creating schema in MySQL database
 mysql --host=`grep mysqlhost configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` --user=`grep mysqlusername configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` `grep mysqldb configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` --password=`grep mysqlpassword configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` < dump_schema.sql
 
-# apply it
+# create postgres foreign tables
+
+# applied dumped data via foreign tables
 
 # set up triggers
 
