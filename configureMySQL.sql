@@ -14,10 +14,3 @@ CREATE USER MAPPING FOR :USER
 SERVER mysql_server
 OPTIONS (username :'mysqlusername', password :'mysqlpassword');
 
----test
-CREATE FOREIGN TABLE warehouse(
-     warehouse_id int,
-     warehouse_name text)
-SERVER mysql_server
-     OPTIONS (dbname :'mysqldb', table_name 'warehouse');
---you have to create the same table on mysql_server with primary key!
