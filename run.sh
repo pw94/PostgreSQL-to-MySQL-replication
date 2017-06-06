@@ -20,11 +20,16 @@ pg_dump -U ${username} --no-owner --data-only -f dump_data.sql
 sed -i '/^--/d' dump_schema.sql
 sed -i '/^$/N;/^\n$/D' dump_schema.sql
 
+# modify schema for postgres foreign tables
+# modify schema for mysql
+# - remove everything except CREATE TABLE and ALTER TABLE
+# - remove ONLY after ALTER TABLE
+
 echo LOG: Configuring connection to MySQL
 psql -U ${username} -d ${db} -a -f configureMySQL.sql
 
-# echo LOG: Creating schema in MySQL database
-# mysql --host=`grep mysqlhost configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` --user=`grep mysqlusername configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` `grep mysqldb configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` --password=`grep mysqlpassword configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` << create_tables_in_MySQL_from_schema_dump.sql
+echo LOG: Creating schema in MySQL database
+mysql --host=`grep mysqlhost configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` --user=`grep mysqlusername configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` `grep mysqldb configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` --password=`grep mysqlpassword configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` < dump_schema.sql
 
 # apply it
 
