@@ -31,8 +31,14 @@ psql -U ${username} -d ${db} -a -f configureMySQL.sql
 echo LOG: Creating schema in MySQL database
 mysql --host=`grep mysqlhost configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` --user=`grep mysqlusername configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` `grep mysqldb configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` --password=`grep mysqlpassword configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` < dump_schema.sql
 
-# create postgres foreign tables
+echo LOG: Creating foreign tables
+awk '{if (/[^;]$/) printf "%s", $0; else print $0}' < dump_schema.sql | awk '/^CREATE TABLE/' | sed 's/^CREATE TABLE/CREATE FOREIGN TABLE/' | awk -v dbname=`grep mysqldb configureMySQL.sql | awk 'NR==1{print $3}' | tr -d \'` '{$4=$4"_ft"; sub(/;$/," SERVER mysql_server OPTIONS (dbname \x27"dbname"\x27, table_name \x27"$4"\x27);"); print}' > dump_schema_ft.sql
+# execute dump_schema_ft.sql on postgres
 
+
+sed -i '/^--/d' dump_data.sql
+sed -i '/^SET/d' dump_data.sql
+# append something to the name of the table -> _FT
 # applied dumped data via foreign tables
 
 # set up triggers
