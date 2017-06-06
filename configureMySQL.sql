@@ -1,8 +1,8 @@
-\set mysqlhost 'sql11.freemysqlhosting.net'
+\set mysqlhost '127.0.0.1'
 \set mysqlport '3306'
-\set mysqldb 'sql11178311'
-\set mysqlusername 'sql11178311'
-\set mysqlpassword 'PECxHPkfsv'
+\set mysqldb 'mydb'
+\set mysqlusername 'root'
+\set mysqlpassword '123456'
 
 CREATE EXTENSION mysql_fdw;
 
