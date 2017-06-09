@@ -3,6 +3,8 @@ db="postgres"
 username="postgres"
 export PGPASSWORD=123 # user password
 
+echo LOG: PREPARING DB STRUCTURE
+
 echo LOG: Creating tables in db: ${db}
 psql -U ${username} -d ${db} -a -f create_tables.sql
 
@@ -10,7 +12,7 @@ echo LOG: Inserting data
 psql -U ${username} -d ${db} -a -f insert_COMPANY_MEMEBERS1.sql
 psql -U ${username} -d ${db} -a -f insert_DEPARTMENT1.sql
 
-echo LOG: Preparing replication mechanism
+echo LOG: PREPARING REPLICATION MECHANISM
 
 echo LOG: Dumping ${db} schema
 pg_dump -U ${username} --no-owner --schema-only -f dump_schema.sql
@@ -40,14 +42,18 @@ pg_dump -U ${username} --no-owner --data-only --column-inserts | sed '/^--/d' | 
 echo LOG: Appling data via foreign tables
 psql -U ${username} -d ${db} -a -f dump_data.sql
 
-# set up triggers
+echo LOG: Generating triggers
+psql -U ${username} -d ${db} -f generate_triggers.sql | grep 'CREATE TRIGGER' > create_triggers.sql
 
-# maybe move the rest to test script?
+echo LOG: Creating triggers on ${db}
+psql -U ${username} -d ${db} -a -f replication.sql
+psql -U ${username} -d ${db} -a -f create_triggers.sql
+
+echo LOG: TESTING
+
 echo LOG: Inserting new data into db: ${db}
 psql -U ${username} -d ${db} -a -f insert_COMPANY_MEMEBERS2.sql
 psql -U ${username} -d ${db} -a -f insert_DEPARTMENT2.sql
-
-# maybe check if data was transfer on foreign server?
 
 echo LOG: Updating data in db: ${db}
 psql -U ${username} -d ${db} -a -f update_COMPANY_MEMBERS.sql
