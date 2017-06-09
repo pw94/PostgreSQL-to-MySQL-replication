@@ -1,7 +1,9 @@
 SELECT
     'CREATE TRIGGER '
+    || replace(tab_name, '.', '_')
+    || ' AFTER INSERT OR UPDATE OR DELETE ON '
     || tab_name
-    || ' AFTER INSERT OR UPDATE OR DELETE FOR EACH ROW EXECUTE PROCEDURE function_replication();' AS trigger_creation_query
+    || ' FOR EACH ROW EXECUTE PROCEDURE function_replication();' AS trigger_creation_query
 FROM (
     SELECT
         quote_ident(table_schema) || '.' || quote_ident(table_name) as tab_name
